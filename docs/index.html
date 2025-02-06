@@ -1,11 +1,82 @@
 <!DOCTYPE html>
-<html lang="jp">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>サンプル</title>
+    <link rel="stylesheet" href="click_game_styles.css">
+    <title>クリックゲーム</title>
 </head>
 <body>
-    GitHub Pagesで見えるか
+    <h1>クリックゲーム</h1>
+    <p>スコア: <span id="score">0</span></p>
+    <p>残り時間: <span id="timer">30</span> 秒</p>
+    <div id="game-area">クリック！</div>
+    
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+        let gameActive = true;
+
+        document.getElementById("game-area").addEventListener("click", function() {
+            if (gameActive) {
+                score++;
+                document.getElementById("score").textContent = score;
+            }
+        });
+
+        //+10ボタン判定
+        function createBonusButton() {
+            if (!gameActive) return;
+
+            let button = document.createElement("button");
+            button.textContent = "+10";
+            button.classList.add("bonus-button");
+            
+            let x = Math.random() * (window.innerWidth - 60);
+            let y = Math.random() * (window.innerHeight - 60);
+            
+            button.style.left = `${x}px`;
+            button.style.top = `${y}px`;
+            
+            button.addEventListener("click", function() {
+                if (gameActive) {
+                    score += 10;
+                    document.getElementById("score").textContent = score;
+                    button.remove();
+                }
+            });
+            
+            document.body.appendChild(button);
+            
+            setTimeout(() => button.remove(), 3000);
+        }
+        
+        //+10ボタン発生判定
+        function spawnBonusButton() {
+            if (!gameActive) return;
+            
+            setTimeout(() => {
+                createBonusButton();
+                spawnBonusButton();
+            }, Math.random() * 5000 + 2000);
+        }
+        
+        //タイマー
+        function startTimer() {
+            let timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    document.getElementById("timer").textContent = timeLeft;
+                } else {
+                    clearInterval(timerInterval);
+                    gameActive = false;
+                    alert("ゲーム終了！スコア: " + score);
+                }
+            }, 1000);
+        }
+        
+        spawnBonusButton();
+        startTimer();
+    </script>
 </body>
 </html>
